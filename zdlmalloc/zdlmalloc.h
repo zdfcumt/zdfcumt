@@ -1,3 +1,6 @@
+#ifndef __ZDLMALLOC_H__
+#define __ZDLMALLOC_H__
+
 #include "zdlmalloc_def.h"
 
 
@@ -66,3 +69,4 @@ void malloc_stats();
 
 
 
+#endif//__ZDLMALLOC_H__
