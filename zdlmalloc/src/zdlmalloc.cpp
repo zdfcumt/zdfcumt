@@ -66,7 +66,7 @@ mchunkptr malloc_from_sys(size_t nb)
                        / SBRK_UNIT) * SBRK_UNIT;
 
 
-  cp = (char*)(sbrk(sbrk_size));
+  cp = (char*)(SBRK(sbrk_size));
   if (cp == (char*)(-1)) /* sbrk returns -1 on failure */
     return 0;
 
@@ -187,7 +187,7 @@ void malloc_clean_bin(mbinptr bin)
 
 
 
-Void_t* malloc(size_t bytes)
+Void_t* zdlmalloc(size_t bytes)
 {
   static size_t previous_request = 0;  /* To control preallocation */
 
@@ -365,7 +365,7 @@ Void_t* malloc(size_t bytes)
 
 
 
-void free(Void_t* mem)
+void zdlfree(Void_t* mem)
 {
   if (mem != 0)
   {
@@ -374,10 +374,10 @@ void free(Void_t* mem)
   }
 }
 
-Void_t* realloc(Void_t* mem, size_t bytes)
+Void_t* zdlrealloc(Void_t* mem, size_t bytes)
 {
   if (mem == 0) 
-    return malloc(bytes);
+    return zdlmalloc(bytes);
   else
   {
     size_t       nb      = request2size(bytes);
@@ -423,7 +423,7 @@ Void_t* realloc(Void_t* mem, size_t bytes)
       size_t* dst;
 
       set_inuse(p);    /* don't let malloc consolidate us yet! */
-      newmem = malloc(nb);
+      newmem = zdlmalloc(nb);
 
       if (newmem != 0) {
         /* Copy -- we know that alignment is at least `size_t' */
@@ -433,7 +433,7 @@ Void_t* realloc(Void_t* mem, size_t bytes)
         while (count-- > 0) *dst++ = *src++;
       }
 
-      free(mem);
+      zdlfree(mem);
       return newmem;
     }
   }
@@ -454,7 +454,7 @@ Void_t* memalign(size_t alignment, size_t bytes)
   /* we will give back extra */
 
   size_t req = nb + align + MINSIZE;
-  Void_t*  m = malloc(req);
+  Void_t*  m = zdlmalloc(req);
 
   if (m == 0) return 0; /* propagate failure */
 
@@ -521,10 +521,10 @@ Void_t* valloc(size_t bytes)
 }
 
 
-Void_t* calloc(size_t n, size_t elem_size)
+Void_t* zdlcalloc(size_t n, size_t elem_size)
 {
   size_t sz = n * elem_size;
-  Void_t* p = malloc(sz);
+  Void_t* p = zdlmalloc(sz);
   char* q = (char*) p;
   while (sz-- > 0) *q++ = 0;
   return p;
@@ -533,7 +533,7 @@ Void_t* calloc(size_t n, size_t elem_size)
 
 void cfree(Void_t *mem)
 {
-  free(mem);
+  zdlfree(mem);
 }
 
 
@@ -581,4 +581,17 @@ void malloc_stats()
   fprintf(stderr, "total mem = %10u\n", sbrked_mem);
   fprintf(stderr, "in use    = %10u\n", malloced_mem);
 
+}
+
+
+
+
+
+
+
+
+int main(int argn, const char* argv[])
+{
+	int i = 0;
+	i = i * 10;
 }

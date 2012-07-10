@@ -59,18 +59,43 @@ pretty fast, it is better to avoid it.
 
 #include <stddef.h>   /* for size_t */
 #include <stdio.h>    /* needed for malloc_stats */
+#ifdef WIN32
+#include <windows.h>
+#else
+
+#endif
 
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+#ifdef WIN32
+#define SBRK(SIZE)		((Void_t*)VirtualAlloc(NULL, (SIZE), MEM_COMMIT, PAGE_READWRITE))
+#else
 extern Void_t*     sbrk _ARG_((size_t));
+#define SBRK(SIZE)		(sbrk(SIZE))
+#endif
+
+
 
 //* mechanics for getpagesize; adapted from bsd/gnu getpagesize.h */
+#ifdef WIN32
+/* getpagesize for windows */
+static long getpagesize (void) {
+	static long g_pagesize = 0;
+	if (! g_pagesize) {
+		SYSTEM_INFO system_info;
+		GetSystemInfo (&system_info);
+		g_pagesize = system_info.dwPageSize;
+	}
+	return g_pagesize;
+}
+#define malloc_getpagesize getpagesize()
+#else
 extern size_t getpagesize();
 #define malloc_getpagesize getpagesize()
-
+#endif
 
 #ifdef __cplusplus
 };  /* end of extern "C" */
