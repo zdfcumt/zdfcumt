@@ -3,7 +3,9 @@
 
 //Base on dlmalloc 2.5
 
-
+#ifndef NOMACRO
+#define NOMACRO 1
+#endif
 /*
 SBRK_UNIT is a good power of two to call sbrk with It should
 normally be system page size or a multiple thereof.  If sbrk is very
@@ -116,21 +118,39 @@ typedef struct malloc_chunk* mchunkptr;
 
 
 /*  sizes, alignments */
-#define SIZE_SZ              (sizeof(size_t))
-#define MALLOC_MIN_OVERHEAD  (SIZE_SZ + SIZE_SZ)
-#define MALLOC_ALIGN_MASK    (MALLOC_MIN_OVERHEAD - 1)
-#define MINSIZE              (sizeof(struct malloc_chunk) + SIZE_SZ)
+#define SIZE_SZ              (sizeof(size_t))								//4
+#define MALLOC_MIN_OVERHEAD  (SIZE_SZ + SIZE_SZ)							//8
+#define MALLOC_ALIGN_MASK    (MALLOC_MIN_OVERHEAD - 1)						//7
+#define MINSIZE              (sizeof(struct malloc_chunk) + SIZE_SZ)		//16
 
 
 
 /* pad request bytes into a usable size */
+//zdf 返回一个以MALLOC_MIN_OVERHEAD为步进的至少比给定参数大MALLOC_MIN_OVERHEAD的返回值
+#if NOMACRO
+static size_t request2size(size_t req)
+{
+	if (req <= 0){
+		return MINSIZE;
+	}else{
+		return (req + MALLOC_MIN_OVERHEAD + MALLOC_ALIGN_MASK) & ~(MALLOC_ALIGN_MASK);
+	}
+}
+#else
 #define request2size(req)	( ((long)(req) <= 0) ?  MINSIZE : (((req) + MALLOC_MIN_OVERHEAD + MALLOC_ALIGN_MASK) & ~(MALLOC_ALIGN_MASK)))
+#endif
 
 /* Check if m has acceptable alignment */
 #define aligned_OK(m)		( ( (size_t)((m)) & (MALLOC_ALIGN_MASK) ) == 0 )
 
 /* Check if a chunk is immediately usable */
+#if NOMACRO
+static bool exact_fit(mchunkptr ptr, size_t req){
+	return ((ptr->size - req) < MINSIZE);
+}
+#else
 #define exact_fit(ptr, req) ( (unsigned)((ptr)->size - (req)) < MINSIZE )
+#endif
 
 /* maintaining INUSE via size field */
 #define INUSE  0x1		/* size field is or'd with INUSE when in use */
@@ -258,6 +278,26 @@ static	mchunkptr	last_remainder = 0;		/* last remaindered chunk from malloc */
         to find quadrant. The offsets for loop termination and
         quartering allow bins to start, not end at powers.
 */
+#if NOMACRO
+static void findbin(size_t& Sizefb, mbinptr& Bfb)
+{
+	size_t Sfb = (Sizefb);
+	if (Sfb < MAX_SMALLBIN_SIZE)
+		(Bfb) = (av + (Sfb >> 3));
+	else
+	{
+		/* Offset wrt small bins */
+		size_t Ifb = MAX_SMALLBIN_OFFSET;
+		Sfb >>= 3;
+		/* find power of 2 */
+		while (Sfb >= (MINSIZE * 2)) { Ifb += 4; Sfb >>= 1; }
+		/* adjust for quadrant */
+		Ifb += (Sfb - MINSIZE) >> 2;
+		(Bfb) = av + Ifb;
+	}
+}
+
+#else
 #define findbin(Sizefb, Bfb)												  \
 {																			  \
   size_t Sfb = (Sizefb);													  \
@@ -277,14 +317,28 @@ static	mchunkptr	last_remainder = 0;		/* last remaindered chunk from malloc */
 }																			  \
 
 
+#endif
+
+
 /* Keep track of the maximum actually used clean bin, to make loops faster */
 /* (Not worth it to do the same for dirty ones) */
 static mbinptr maxClean = FIRSTBIN;
+#if NOMACRO
+static void reset_maxClean_f(){
+	while (maxClean > FIRSTBIN && clean_head(maxClean)==last_clean(maxClean))
+	--maxClean;
+}
+#define	reset_maxClean	reset_maxClean_f()
+
+#else
+
 #define reset_maxClean														  \
 {																			  \
   while (maxClean > FIRSTBIN && clean_head(maxClean)==last_clean(maxClean))	  \
     --maxClean;																  \
 }																			  \
+
+#endif
 
 
 
@@ -364,6 +418,17 @@ static mbinptr maxClean = FIRSTBIN;
 
 /* Place the held remainder in its bin */
 /* This MUST be invoked prior to ANY consolidation */
+#if NOMACRO
+static void clear_last_remainder_f(){
+	if (last_remainder != 0)
+	{
+		cleanlink(last_remainder);
+		last_remainder = 0;
+	}
+};
+#define clear_last_remainder (clear_last_remainder_f())
+#else
+
 #define clear_last_remainder												  \
 {																			  \
   if (last_remainder != 0)													  \
@@ -373,6 +438,7 @@ static mbinptr maxClean = FIRSTBIN;
   }																			  \
 }																			  \
 
+#endif
 
 /* Place a freed chunk on the returned_list */
 #define return_chunk(Prc)													  \

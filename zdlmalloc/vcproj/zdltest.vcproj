@@ -19,7 +19,7 @@
 		<Configuration
 			Name="Debug|Win32"
 			OutputDirectory="../bin"
-			IntermediateDirectory="../debug"
+			IntermediateDirectory="../debug_zdltest"
 			ConfigurationType="1"
 			CharacterSet="1"
 			>

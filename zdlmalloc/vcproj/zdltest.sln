@@ -2,6 +2,9 @@
 Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Studio 2008
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zdltest", "zdltest.vcproj", "{1EC74374-EF98-4757-A4DA-0658805AB257}"
+	ProjectSection(ProjectDependencies) = postProject
+		{CA6D122C-6755-4705-B04A-E1608C0B6E76} = {CA6D122C-6755-4705-B04A-E1608C0B6E76}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zdlmalloc", "zdlmalloc.vcproj", "{CA6D122C-6755-4705-B04A-E1608C0B6E76}"
 EndProject

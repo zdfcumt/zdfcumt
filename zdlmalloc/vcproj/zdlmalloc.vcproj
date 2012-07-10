@@ -18,7 +18,7 @@
 		<Configuration
 			Name="Debug|Win32"
 			OutputDirectory="../lib"
-			IntermediateDirectory="../debug"
+			IntermediateDirectory="../debug_zdlmalloc"
 			ConfigurationType="4"
 			CharacterSet="2"
 			>
