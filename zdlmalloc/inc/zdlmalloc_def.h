@@ -179,7 +179,7 @@ static bool exact_fit(mchunkptr ptr, size_t req){
 
 
 /* conversion from malloc headers to user pointers, and back */
-#define chunk2mem(p)		( (Void_t*)((char*)(p) + SIZE_SZ) )
+#define chunk2mem(p)		( (Void_t*)((char*)(p) + SIZE_SZ) )					//size数据位是不作为mem使用的
 #define mem2chunk(mem)		( (mchunkptr)((char*)(mem) - SIZE_SZ) )
 
 
@@ -259,8 +259,8 @@ static struct malloc_bin  av[NBINS] =
   returned_list is just singly linked for speed in free().
   last_remainder currently has length of at most one.
 */
-static	mchunkptr	returned_list = 0;		/* List of (unbinned) returned chunks */
-static	mchunkptr	last_remainder = 0;		/* last remaindered chunk from malloc */
+static	mchunkptr	returned_list = 0;		/* List of (unbinned) returned chunks *///外部因要释放而返还的chunk
+static	mchunkptr	last_remainder = 0;		/* last remaindered chunk from malloc *///上次申请的空间的剩余的chunk
 
 
 
@@ -283,14 +283,17 @@ static void findbin(size_t& Sizefb, mbinptr& Bfb)
 {
 	size_t Sfb = (Sizefb);
 	if (Sfb < MAX_SMALLBIN_SIZE)
-		(Bfb) = (av + (Sfb >> 3));
+		(Bfb) = (av + (Sfb >> 3));//av[2]-av[18],,MAX_SMALLBIN_OFFSET=18
 	else
 	{
 		/* Offset wrt small bins */
 		size_t Ifb = MAX_SMALLBIN_OFFSET;
 		Sfb >>= 3;
 		/* find power of 2 */
-		while (Sfb >= (MINSIZE * 2)) { Ifb += 4; Sfb >>= 1; }
+		while (Sfb >= (MINSIZE * 2)) {
+			Ifb += 4; 
+			Sfb >>= 1; 
+		}
 		/* adjust for quadrant */
 		Ifb += (Sfb - MINSIZE) >> 2;
 		(Bfb) = av + Ifb;
@@ -345,6 +348,7 @@ static void reset_maxClean_f(){
 
 /* Macros for linking and unlinking chunks */
 /* take a chunk off a list */
+//zdf 双链表的元素的删除
 #define unlink(Qul)															  \
 {																			  \
   mchunkptr Bul = (Qul)->bk;												  \
@@ -355,6 +359,26 @@ static void reset_maxClean_f(){
 
 
 /* place a chunk on the dirty list of its bin */
+#if NOMACRO
+static void dirtylink(mchunkptr Qdl)
+{
+	mchunkptr Pdl = (Qdl);
+	mbinptr   Bndl;
+	mchunkptr Hdl, Fdl;
+
+	findbin(Pdl->size, Bndl);
+	Hdl  = dirty_head(Bndl);
+	Fdl  = Hdl->fd;
+
+	Pdl->bk = Hdl;  
+	Pdl->fd = Fdl;  
+	Fdl->bk = Pdl;
+	Hdl->fd = Pdl;
+}
+
+
+#else
+
 #define dirtylink(Qdl)														  \
 {																			  \
   mchunkptr Pdl = (Qdl);													  \
@@ -369,6 +393,9 @@ static void reset_maxClean_f(){
 }																			  \
 
 
+#endif
+
+//将Qcl插入到bin的chd的第一个，即插入到clean list的列首
 /* Place a consolidated chunk on a clean list */
 #define cleanlink(Qcl)														  \
 {																			  \

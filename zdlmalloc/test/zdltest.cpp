@@ -6,12 +6,14 @@
 
 int _tmain(int argc, _TCHAR* argv[])
 {
-	//for (int i = 1; i < 1024; ++i) {
-		void* pMem = zdlmalloc(17);
-		assert(NULL != pMem);
-		zdlfree(pMem);
-		pMem = NULL;
-	//}
+	void* pMemArr[1024];
+	for (int i = 3; i < 1024; i+=8) {
+		pMemArr[i] = zdlmalloc(102410);
+	}
+	for (int i = 3; i < 1024; i+=8) {
+		zdlfree(pMemArr[i]);
+		pMemArr[i] = NULL;
+	}
 	return 0;
 }
 
