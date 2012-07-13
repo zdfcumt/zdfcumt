@@ -2,14 +2,16 @@
 //
 #include "stdafx.h"
 #include "zdlmalloc.h"
+#include "malloc-2.8.4.h"
 #include <assert.h>
 
 void test_zdl();
+void test_malloc_284();
 
 int _tmain(int argc, _TCHAR* argv[])
 {
-	test_zdl();
-
+	//test_zdl();
+	test_malloc_284();
 	return 0;
 }
 
@@ -30,4 +32,7 @@ void test_zdl()
 
 
 
+void test_malloc_284()
+{
 
+}
