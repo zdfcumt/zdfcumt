@@ -539,7 +539,7 @@ MAX_RELEASE_CHECK_RATE   default: 4095 unless not HAVE_MMAP
 #endif
 
 /* The maximum possible size_t value has all bits set */
-#define MAX_SIZE_T           (~(size_t)0)
+#define MAX_SIZE_T           (~(size_t)0)			//0xFFFFFFFF
 
 #ifndef ONLY_MSPACES
 #define ONLY_MSPACES 0     /* define to a value */
@@ -1448,7 +1448,7 @@ unsigned char _BitScanReverse(unsigned long *index, unsigned long mask);
 #define HALF_MAX_SIZE_T     (MAX_SIZE_T / 2U)
 
 /* The bit mask value corresponding to MALLOC_ALIGNMENT */
-#define CHUNK_ALIGN_MASK    (MALLOC_ALIGNMENT - SIZE_T_ONE)
+#define CHUNK_ALIGN_MASK    (MALLOC_ALIGNMENT - SIZE_T_ONE)		//zdf 7
 
 /* True if address a has acceptable alignment */
 #define is_aligned(A)       (((size_t)((A)) & (CHUNK_ALIGN_MASK)) == 0)
@@ -2065,12 +2065,12 @@ typedef unsigned int flag_t;           /* The type of various bit flag sets */
 
 /* ------------------- Chunks sizes and alignments ----------------------- */
 
-#define MCHUNK_SIZE         (sizeof(mchunk))
+#define MCHUNK_SIZE         (sizeof(mchunk))			//zdf 16
 
 #if FOOTERS
 #define CHUNK_OVERHEAD      (TWO_SIZE_T_SIZES)
 #else /* FOOTERS */
-#define CHUNK_OVERHEAD      (SIZE_T_SIZE)
+#define CHUNK_OVERHEAD      (SIZE_T_SIZE)				//zdf 4
 #endif /* FOOTERS */
 
 /* MMapped chunks need a second word of overhead ... */
@@ -2079,6 +2079,7 @@ typedef unsigned int flag_t;           /* The type of various bit flag sets */
 #define MMAP_FOOT_PAD       (FOUR_SIZE_T_SIZES)
 
 /* The smallest size we can malloc is an aligned minimal chunk */
+//zdf 16
 #define MIN_CHUNK_SIZE\
   ((MCHUNK_SIZE + CHUNK_ALIGN_MASK) & ~CHUNK_ALIGN_MASK)
 
@@ -2434,9 +2435,9 @@ typedef struct malloc_segment* msegmentptr;
 #define SMALLBIN_SHIFT    (3U)
 #define SMALLBIN_WIDTH    (SIZE_T_ONE << SMALLBIN_SHIFT)
 #define TREEBIN_SHIFT     (8U)
-#define MIN_LARGE_SIZE    (SIZE_T_ONE << TREEBIN_SHIFT)
-#define MAX_SMALL_SIZE    (MIN_LARGE_SIZE - SIZE_T_ONE)
-#define MAX_SMALL_REQUEST (MAX_SMALL_SIZE - CHUNK_ALIGN_MASK - CHUNK_OVERHEAD)
+#define MIN_LARGE_SIZE    (SIZE_T_ONE << TREEBIN_SHIFT)			//zdf 256
+#define MAX_SMALL_SIZE    (MIN_LARGE_SIZE - SIZE_T_ONE)			//zdf 255
+#define MAX_SMALL_REQUEST (MAX_SMALL_SIZE - CHUNK_ALIGN_MASK - CHUNK_OVERHEAD)	//zdf 244
 
 struct malloc_state {
   binmap_t   smallmap;
