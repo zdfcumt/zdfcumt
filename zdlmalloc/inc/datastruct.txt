@@ -39,6 +39,12 @@ mem:
 -------------------------------------		--------------|		-|
 -									-|
 -									-|
+...							chunk_szie	-|
+-									-|
+-									-|
+-------------------------------------		--------------|		-|
+-									-|
+-									-|
 -value=SIZE_SZ|INUSE							-|
 -------------------------------------memend	-------------------------|
 
@@ -70,6 +76,14 @@ malloc workflow：
 7、if there is a chunk's size > request size in bin's clean list then remove it and goto split it;
 8、if find a chunk'size > request size from bigger bins' clean list then remove it and goto split it;
 9、malloc_find_space(size_t);
+10、split a request size mem,if the previous_request equals the request size then preallocate some chunks and add to returned_list so next malloc can quickly get mem
+11、reset the last_remainder;
+
+
+
+realloc(Void_t* mem, size_t bytes) work flow:
+
+
 
 
 malloc_find_space(size_t nb) work flow:
@@ -78,6 +92,13 @@ malloc_find_space(size_t nb) work flow:
 3、from lastbin to firstbin if there is a chunk in dirty list;
 	remove it from list and consolidate(it) if it's size > request size return it else add it to it's bin's clean list
 4、malloc_from_sys(size)
+
+
+
+free_returned_list() work flow:
+1、clear INUSE flag of every ele of returned_list and add it to dirty list;
+
+
 
 free workflow：
 将返回的chunk插入到returned_list的链首

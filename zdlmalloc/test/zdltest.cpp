@@ -4,16 +4,30 @@
 #include "zdlmalloc.h"
 #include <assert.h>
 
+void test_zdl();
+
 int _tmain(int argc, _TCHAR* argv[])
 {
-	void* pMemArr[1024];
-	for (int i = 3; i < 1024; i+=8) {
-		pMemArr[i] = zdlmalloc(102410);
-	}
-	for (int i = 3; i < 1024; i+=8) {
-		zdlfree(pMemArr[i]);
-		pMemArr[i] = NULL;
-	}
+	test_zdl();
+
 	return 0;
 }
+
+void test_zdl()
+{
+	void* pMemArr[10240];
+	for (int j = 0; j < 5;j++)
+	{
+		for (int i = 3; i < 10240; i+=16) {
+			pMemArr[i] = valloc(i);
+		}
+		for (int i = 3; i < 10240; i+=16) {
+			zdlfree(pMemArr[i]);
+			pMemArr[i] = NULL;
+		}
+	}
+}
+
+
+
 

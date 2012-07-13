@@ -13,8 +13,11 @@ slow on a system, it pays to increase this.  Otherwise, it should
 not matter too much.
 */
 //zdf what is SBRK
+#ifdef WIN32
+#define SBRK_UNIT (0x10000)
+#else
 #define SBRK_UNIT 8192
-
+#endif
 
 /* 
 MAX_PREALLOCS is the maximum number of chunks to preallocate.  The
@@ -165,10 +168,26 @@ static bool exact_fit(mchunkptr ptr, size_t req){
 
 /* Physical chunk operations  */
 /* Ptr to next physical malloc_chunk. */
+#if NOMACRO
+static mchunkptr next_chunk(mchunkptr p){
+	return ((mchunkptr)( ((char*)(p)) + ((p)->size & ~INUSE) ));
+}
+#else
 #define next_chunk(p)		((mchunkptr)( ((char*)(p)) + ((p)->size & ~INUSE) ))
+#endif
+
 
 /* Ptr to previous physical malloc_chunk */
+#if NOMACRO
+static mchunkptr prev_chunk(mchunkptr p){
+	char* p1 = ((char*)(p));
+	char* p2 = (char*)(p);
+	return ((mchunkptr)( p1 - ( *((size_t*)(p2 - SIZE_SZ)) & ~INUSE)));
+}
+#else
 #define prev_chunk(p)		((mchunkptr)( ((char*)(p)) - ( *((size_t*)((char*)(p) - SIZE_SZ)) & ~INUSE)))
+#endif
+
 
 /* place size at front and back of chunk */
 #define set_size(P, Sz)														  \
@@ -415,6 +434,8 @@ static void dirtylink(mchunkptr Qdl)
 
 
 /* consolidate one chunk */
+//QC是已经从链表中移除
+//从QC开始向前或向后找没有使用的chunk，并合之
 #define consolidate(Qc)														  \
 {																			  \
   for (;;)																	  \
