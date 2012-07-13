@@ -1,0 +1,83 @@
+(双链表)
+malloc_chunk	|-(size_t)size(内存chunk的大小8的倍数,使用后最低位被置位INUSE)
+		|-(malloc_chunk*)fd(forward，指向前一个节点)
+		|-(malloc_chunk*)bk(back，指向后一个节点)
+
+
+malloc_bin	|-(malloc_chunk)dhd(dirty list header 已经使用过并返还的内存chunk的双链表的头结点)
+		|-(malloc_chunk)chd(clear list header 从未使用过的内存chunk的双链表的头结点)
+
+
+
+mem:
+-------------------------------------memstart
+-
+-
+-
+-------------------------------------aligned	-------------------------|
+-									-|
+-									-|
+-value=SIZE_SZ|INUSE							-|
+-------------------------------------		--------------|		-|
+-									-|
+-value=chunk_szie							-|
+-									-|
+---									-|
+-									-|
+-									-|
+-									-|
+---									-|
+-							chunk_szie  	sbrk_size
+-									-|
+......									-|
+-									-|
+-									-|
+---									-|
+-									-|
+-value=chunk_szie							-|
+-									-|
+-------------------------------------		--------------|		-|
+-									-|
+-									-|
+-value=SIZE_SZ|INUSE							-|
+-------------------------------------memend	-------------------------|
+
+
+
+(mchunkptr)returned_list(global,使用过的返回的内存chunk的头结点，总是指向最后一个返回的内存chunk,?chunk的INUSE位并未重置)
+(mchunkptr)last_remainder(global,等于未使用完的内存部分作为的一个chunk,在赋值之前总是先将当前值添加到所属bin的chd链表中)
+
+
+
+malloc workflow：
+1、padded request size to nb;
+2、if the first ele of returned_list is useful for the size then return the chunk;
+3、get the malloc_bin matched the size;
+4、	(nb < MAX_SMALLBIN_SIZE)
+	{
+    		if dhd or cdh of malloc_bin not empty then return remove the chunk from the list and return it;
+		?Why not check the chunk's size whether match the request size:所得到在bin的chunk的大小必然是一致的;
+	}	
+	else
+	{
+		if dhd of malloc_bin no empty,
+		if find a chunk fit the request size and return it;
+		if not find then malloc_clean_bin(malloc_bin)...
+	}
+5、if returned_list's ele's size not fit the request size then clear it's INUSE flag and add it to it's bin's dirty list,
+   else return the chunk and returned_list point to chunk'next;
+6、if last_remainder's size > request size then last_remainder = 0 and goto split;
+7、if there is a chunk's size > request size in bin's clean list then remove it and goto split it;
+8、if find a chunk'size > request size from bigger bins' clean list then remove it and goto split it;
+9、malloc_find_space(size_t);
+
+
+malloc_find_space(size_t nb) work flow:
+1、add last_remainder to bin's clean list;
+2、if maxClean's clean list empty then reset it;
+3、from lastbin to firstbin if there is a chunk in dirty list;
+	remove it from list and consolidate(it) if it's size > request size return it else add it to it's bin's clean list
+4、malloc_from_sys(size)
+
+free workflow：
+将返回的chunk插入到returned_list的链首
