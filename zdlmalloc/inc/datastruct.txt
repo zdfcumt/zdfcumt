@@ -1,52 +1,52 @@
 (双链表)
 malloc_chunk	|-(size_t)size(内存chunk的大小8的倍数,使用后最低位被置位INUSE)
-		|-(malloc_chunk*)fd(forward，指向前一个节点)
-		|-(malloc_chunk*)bk(back，指向后一个节点)
+                |-(malloc_chunk*)fd(forward，指向前一个节点)
+                |-(malloc_chunk*)bk(back，指向后一个节点)
 
 
-malloc_bin	|-(malloc_chunk)dhd(dirty list header 已经使用过并返还的内存chunk的双链表的头结点)
-		|-(malloc_chunk)chd(clear list header 从未使用过的内存chunk的双链表的头结点)
+malloc_bin      |-(malloc_chunk)dhd(dirty list header 已经使用过并返还的内存chunk的双链表的头结点)
+                |-(malloc_chunk)chd(clear list header 从未使用过的内存chunk的双链表的头结点)
 
 
 
-mem:
--------------------------------------memstart
+a block mem:
+-------------------memstart--------------------------
 -
 -
 -
--------------------------------------aligned	-------------------------|
--									-|
--									-|
--value=SIZE_SZ|INUSE							-|
--------------------------------------		--------------|		-|
--									-|
--value=chunk_szie							-|
--									-|
----									-|
--									-|
--									-|
--									-|
----									-|
--							chunk_szie  	sbrk_size
--									-|
-......									-|
--									-|
--									-|
----									-|
--									-|
--value=chunk_szie							-|
--									-|
--------------------------------------		--------------|		-|
--									-|
--									-|
-...							chunk_szie	-|
--									-|
--									-|
--------------------------------------		--------------|		-|
--									-|
--									-|
--value=SIZE_SZ|INUSE							-|
--------------------------------------memend	-------------------------|
+-------------------aligned	-------------------------|
+-                                                   -|
+-                                                   -|
+-value=SIZE_SZ|INUSE                                -|
+-------------------		    --------------|		    -|
+-                                                   -|
+-value=chunk_szie                                   -|
+-                                                   -|
+---                                                 -|
+-                                                   -|
+-                                                   -|
+-                                                   -|
+---                                                 -|
+-                                   chunk_szie  sbrk_size
+-                                                   -|
+......                                              -|
+-                                                   -|
+-                                                   -|
+---                                                 -|
+-                                                   -|
+-value=chunk_szie                                   -|
+-                                                   -|
+-------------------		    --------------|		    -|
+-                                                   -|
+-                                                   -|
+...                                 chunk_szie      -|
+-                                                   -|
+-                                                   -|
+-------------------		    --------------|		    -|
+-                                                   -|
+-                                                   -|
+-value=SIZE_SZ|INUSE                                -|
+-------------------memend   -------------------------|
 
 
 
@@ -56,32 +56,25 @@ mem:
 
 
 malloc workflow：
-1、padded request size to nb;
-2、if the first ele of returned_list is useful for the size then return the chunk;
-3、get the malloc_bin matched the size;
-4、	(nb < MAX_SMALLBIN_SIZE)
-	{
-    		if dhd or cdh of malloc_bin not empty then return remove the chunk from the list and return it;
-		?Why not check the chunk's size whether match the request size:所得到在bin的chunk的大小必然是一致的;
-	}	
-	else
-	{
-		if dhd of malloc_bin no empty,
-		if find a chunk fit the request size and return it;
-		if not find then malloc_clean_bin(malloc_bin)...
+1、修正请求的内存大小;
+2、如果returned_list首个chunk大小合适所请求大小就返回这个chunk;
+3、得到请求大小所属的malloc_bin;
+4、	(size < MAX_SMALLBIN_SIZE){
+        如果malloc_bin的dhd or cdh存在chunk就返回这个chunk;
+    }else{
+        如果malloc_bin.dhd不为空｛
+            从malloc_bin的dhd中找到合适的大小的chunk就返回这个chunk，
+            否则将last_remainder，returned_list，以及malloc_bin.dhd中的chunk全部添加到malloc_bin.chd中
+        ｝
 	}
-5、if returned_list's ele's size not fit the request size then clear it's INUSE flag and add it to it's bin's dirty list,
-   else return the chunk and returned_list point to chunk'next;
-6、if last_remainder's size > request size then last_remainder = 0 and goto split;
-7、if there is a chunk's size > request size in bin's clean list then remove it and goto split it;
-8、if find a chunk'size > request size from bigger bins' clean list then remove it and goto split it;
+5、如果returned_list中的chunk不合适所请求的尺寸，就清除他的INUSE标志，并添加到其大小所属的malloc_bin.dhd中；
+   如果找到一个合适的chunk，就将returned_list指向此chunk的下一个chunk，并返回此chunk
+6、如果last_remainder指向的chunk是个合适的chunk，那么last_remainder = 0 and goto split the chunk;
+7、如果请求大小所属malloc_bin.chd中存在一个合适的chunk，则将此chunk从chd列表中移除and goto split the chunk;
+8、如果从大于请求大小所属的malloc_bin.chd中找到一个合适的chunk，则将此chunk从chd列表中移除and goto split the chunk;
 9、malloc_find_space(size_t);
 10、split a request size mem,if the previous_request equals the request size then preallocate some chunks and add to returned_list so next malloc can quickly get mem
-11、reset the last_remainder;
-
-
-
-realloc(Void_t* mem, size_t bytes) work flow:
+11、reset last_remainder;
 
 
 
@@ -89,14 +82,14 @@ realloc(Void_t* mem, size_t bytes) work flow:
 malloc_find_space(size_t nb) work flow:
 1、add last_remainder to bin's clean list;
 2、if maxClean's clean list empty then reset it;
-3、from lastbin to firstbin if there is a chunk in dirty list;
+3、from lastbin to firstbin if there is a chunk in dirty list,
 	remove it from list and consolidate(it) if it's size > request size return it else add it to it's bin's clean list
 4、malloc_from_sys(size)
 
 
 
 free_returned_list() work flow:
-1、clear INUSE flag of every ele of returned_list and add it to dirty list;
+1、清除returned_list的每个chunk的INUSE标志并添加到其所属的malloc_bin.dhd链表中;returned_list = 0；
 
 
 
