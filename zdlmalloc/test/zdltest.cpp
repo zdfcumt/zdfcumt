@@ -58,9 +58,23 @@ void test_zdl()
 #if MALLOC284
 void test_malloc_284()
 {
-	void* pMem = dlmalloc(244);
-	dlfree(pMem);
-	pMem = dlmalloc(245);
-	dlfree(pMem);
+	void* pMemArr[10240];
+	for (int j = 0; j < 5;j++)
+	{
+		for (int i = 3; i < 10240; i+=16) {
+			pMemArr[i] = dlmalloc(i);
+		}
+		for (int i = 3; i < 10240; i+=16) {
+			dlfree(pMemArr[i]);
+			pMemArr[i] = NULL;
+		}
+	}
+
+
+	//void* pMem = dlmalloc(244);
+	//dlfree(pMem);
+	//pMem = dlmalloc(245);
+	//dlfree(pMem);
+
 }
 #endif

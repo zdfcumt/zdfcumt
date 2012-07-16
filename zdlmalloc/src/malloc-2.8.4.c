@@ -2090,6 +2090,7 @@ typedef unsigned int flag_t;           /* The type of various bit flag sets */
 #define align_as_chunk(A)   (mchunkptr)((A) + align_offset(chunk2mem(A)))
 
 /* Bounds on request (not chunk) sizes. */
+//zdf -64
 #define MAX_REQUEST         ((-MIN_CHUNK_SIZE) << 2)
 #define MIN_REQUEST         (MIN_CHUNK_SIZE - CHUNK_OVERHEAD - SIZE_T_ONE)
 
@@ -2478,7 +2479,7 @@ struct malloc_params {
   volatile size_t magic;
   size_t page_size;
   size_t granularity;
-  size_t mmap_threshold;
+  size_t mmap_threshold;	//zdf mmapµÄ·§Öµ
   size_t trim_threshold;
   flag_t default_mflags;
 };
@@ -2537,6 +2538,7 @@ static struct malloc_state _gm_;
 #endif
 
 /* For sys_alloc, enough padding to ensure can malloc request on success */
+//zdf 48
 #define SYS_ALLOC_PADDING (TOP_FOOT_SIZE + MALLOC_ALIGNMENT)
 
 #define is_page_aligned(S)\
@@ -2581,6 +2583,7 @@ static int has_segment_link(mstate m, msegmentptr ss) {
   that may be needed to place segment records and fenceposts when new
   noncontiguous segments are added.
 */
+//zdf 40
 #define TOP_FOOT_SIZE\
   (align_offset(chunk2mem(0))+pad_request(sizeof(struct malloc_segment))+MIN_CHUNK_SIZE)
 
