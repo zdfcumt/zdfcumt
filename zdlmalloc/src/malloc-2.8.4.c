@@ -1468,8 +1468,8 @@ unsigned char _BitScanReverse(unsigned long *index, unsigned long mask);
 
 
 /* MORECORE and MMAP must return MFAIL on failure */
-#define MFAIL                ((void*)(MAX_SIZE_T))
-#define CMFAIL               ((char*)(MFAIL)) /* defined for convenience */
+#define MFAIL                ((void*)(MAX_SIZE_T))								//zdf 0xFFFFFFFF
+#define CMFAIL               ((char*)(MFAIL)) /* defined for convenience */		//zdf 0xFFFFFFFF
 
 #if HAVE_MMAP
 
