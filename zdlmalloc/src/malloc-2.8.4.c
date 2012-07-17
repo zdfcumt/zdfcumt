@@ -1,8 +1,48 @@
 /*
+FOOTERS：
+additional check to improve security at the expense of time and space，那么使用与不使用FOOTERS性能有多少区别
+*/
+
+/*
+PROCEED_ON_ERROR:
+By default detected(检测) errors cause the program to abort (calling
+"abort()"). You can override this to instead proceed past errors by defining PROCEED_ON_ERROR
+*/
+
+/*
+CORRUPTION_ERROR_ACTION:
+USAGE_ERROR_ACTION:
+INSECURE:
+       If you don't like either of these options, you can define
+       CORRUPTION_ERROR_ACTION and USAGE_ERROR_ACTION to do anything
+       else. And if if you are sure that your program using malloc has
+       no errors or vulnerabilities, you can define INSECURE to 1,
+       which might (or might not) provide a small performance improvement.
+*/
+
+/*
+USE_LOCKS:
+NOT thread-safe unless USE_LOCKS defined
+If you are using malloc in a concurrent(并发)
+program, consider instead using nedmalloc
+*/
+
+/*
+NO_SEGMENT_TRAVERSAL       default: 0
+  If non-zero, suppresses traversals of memory segments
+  returned by either MORECORE or CALL_MMAP. This disables
+  merging of segments that are contiguous, and selectively
+  releasing them to the OS if unused, but bounds execution times.
+*/
+
+
+//----------------------------------------------------------------------
+
+/*
   This is a version (aka dlmalloc) of malloc/free/realloc written by
   Doug Lea and released to the public domain, as explained at
   http://creativecommons.org/licenses/publicdomain.  Send questions,
-  comments, complaints, performance data, etc to dl@cs.oswego.edu
+  comments, complaints(抱怨、控诉), performance data（性能数据）, etc to dl@cs.oswego.edu
 
 * Version 2.8.4 Wed May 27 09:56:23 2009  Doug Lea  (dl at gee)
 
@@ -22,37 +62,37 @@
      ftp://gee.cs.oswego.edu/pub/misc/malloc-2.8.4.h
   You don't really need this .h file unless you call functions not
   defined in your system include files.  The .h file contains only the
-  excerpts from this file needed for using this malloc on ANSI C/C++
+  excerpts（摘要） from this file needed for using this malloc on ANSI C/C++
   systems, so long as you haven't changed compile-time options about
   naming and tuning parameters.  If you do, then you can create your
   own malloc.h that does include all settings by cutting at the point
   indicated below. Note that you may already by default be using a C
   library containing a malloc that is based on some version of this
   malloc (for example in linux). You might still want to use the one
-  in this file to customize settings or to avoid overheads associated
-  with library versions.
+  in this file to customize settings(自动定义设置) or to avoid overheads associated
+  with library versions(避免与库版本相关的开销).
 
 * Vital statistics:
 
-  Supported pointer/size_t representation:       4 or 8 bytes
+  Supported pointer/size_t representation(支持的指针表示):       4 or 8 bytes
        size_t MUST be an unsigned type of the same width as
        pointers. (If you are using an ancient system that declares
        size_t as a signed type, or need it to be a different width
        than pointers, you can use a previous release of this malloc
        (e.g. 2.7.2) supporting these.)
 
-  Alignment:                                     8 bytes (default)
-       This suffices for nearly all current machines and C compilers.
+  Alignment(对齐):                                     8 bytes (default)
+       This suffices for(满足) nearly all current machines and C compilers.
        However, you can define MALLOC_ALIGNMENT to be wider than this
-       if necessary (up to 128bytes), at the expense of using more space.
+       if necessary (up to 128bytes), at the expense of using more space(以使用更多的空间为代价).
 
-  Minimum overhead per allocated chunk:   4 or  8 bytes (if 4byte sizes)
+  Minimum overhead per allocated chunk(分配的chunk的最小的头大小):   4 or  8 bytes (if 4byte sizes)
                                           8 or 16 bytes (if 8byte sizes)
        Each malloced chunk has a hidden word of overhead holding size
        and status information, and additional cross-check word
        if FOOTERS is defined.
 
-  Minimum allocated size: 4-byte ptrs:  16 bytes    (including overhead)
+  Minimum allocated size(最小的分配的字节大小): 4-byte ptrs:  16 bytes    (including overhead)
                           8-byte ptrs:  32 bytes    (including overhead)
 
        Even a request for zero bytes (i.e., malloc(0)) returns a
@@ -65,55 +105,55 @@
        mmap unit); typically 4096 or 8192 bytes.
 
   Security: static-safe; optionally more or less
-       The "security" of malloc refers to the ability of malicious
-       code to accentuate the effects of errors (for example, freeing
+       The "security" of malloc refers to the ability of malicious(恶意)
+       code to accentuate(突出) the effects of errors (for example, freeing
        space that is not currently malloc'ed or overwriting past the
        ends of chunks) in code that calls malloc.  This malloc
-       guarantees not to modify any memory locations below the base of
-       heap, i.e., static variables, even in the presence of usage
-       errors.  The routines additionally detect most improper frees
-       and reallocs.  All this holds as long as the static bookkeeping
-       for malloc itself is not corrupted by some other means.  This
-       is only one aspect of security -- these checks do not, and
+       guarantees(保证) not to modify any memory locations below the base of
+       heap, i.e., static variables, even in the presence(在场) of usage
+       errors.  The routines(例程) additionally detect(检测) most improper(不当) frees
+       and reallocs.  All this holds(起作用) as long as the static bookkeeping(簿记)
+       for malloc itself is not corrupted(损坏) by some other means(其他的一些手段).  This
+       is only one aspect(方面) of security -- these checks do not, and
        cannot, detect all possible programming errors.
 
        If FOOTERS is defined nonzero, then each allocated chunk
        carries an additional check word to verify that it was malloced
        from its space.  These check words are the same within each
-       execution of a program using malloc, but differ across
-       executions, so externally crafted fake chunks cannot be
-       freed. This improves security by rejecting frees/reallocs that
-       could corrupt heap memory, in addition to the checks preventing
+       execution of a program(一个程序的执行实例) using malloc, but differ across
+       executions, so externally crafted fake chunks(外部伪造的chunk) cannot be
+       freed. This improves security by rejecting(拒绝) frees/reallocs that
+       could corrupt heap memory, in addition to the checks preventing(防止)
        writes to statics that are always on.  This may further improve
        security at the expense of time and space overhead.  (Note that
        FOOTERS may also be worth using with MSPACES.)
 
-       By default detected errors cause the program to abort (calling
+       By default detected(检测) errors cause the program to abort (calling
        "abort()"). You can override this to instead proceed past
        errors by defining PROCEED_ON_ERROR.  In this case, a bad free
        has no effect, and a malloc that encounters a bad address
        caused by user overwrites will ignore the bad address by
        dropping pointers and indices to all known memory. This may
-       be appropriate for programs that should continue if at all
+       be appropriate(适当) for programs that should continue if at all
        possible in the face of programming errors, although they may
-       run out of memory because dropped memory is never reclaimed.
+       run out of memory(内存耗尽) because dropped memory(丢弃的内存) is never reclaimed(回收).
 
        If you don't like either of these options, you can define
        CORRUPTION_ERROR_ACTION and USAGE_ERROR_ACTION to do anything
        else. And if if you are sure that your program using malloc has
-       no errors or vulnerabilities, you can define INSECURE to 1,
+       no errors or vulnerabilities(漏洞), you can define INSECURE to 1,
        which might (or might not) provide a small performance improvement.
 
   Thread-safety: NOT thread-safe unless USE_LOCKS defined
        When USE_LOCKS is defined, each public call to malloc, free,
-       etc is surrounded with either a pthread mutex or a win32
+       etc is surrounded(围绕) with either a pthread mutex or a win32
        spinlock (depending on WIN32). This is not especially fast, and
-       can be a major bottleneck.  It is designed only to provide
+       can be a major bottleneck(瓶颈).  It is designed only to provide
        minimal protection in concurrent environments, and to provide a
-       basis for extensions.  If you are using malloc in a concurrent
+       basis for extensions(扩展).  If you are using malloc in a concurrent(并发)
        program, consider instead using nedmalloc
        (http://www.nedprod.com/programs/portable/nedmalloc/) or
-       ptmalloc (See http://www.malloc.de), which are derived
+       ptmalloc (See http://www.malloc.de), which are derived(源于)
        from versions of this malloc.
 
   System requirements: Any combination of MORECORE and/or MMAP/MUNMAP
@@ -125,50 +165,51 @@
        based on VirtualAlloc. It also uses common C library functions
        like memset.
 
-  Compliance: I believe it is compliant with the Single Unix Specification
+  Compliance(承诺): I believe it is compliant(遵从) with the Single Unix Specification(规范)
        (See http://www.unix.org). Also SVID/XPG, ANSI C, and probably
        others as well.
 
-* Overview of algorithms
+* Overview of algorithms(算法概览)
 
-  This is not the fastest, most space-conserving, most portable, or
-  most tunable malloc ever written. However it is among the fastest
+  This is not the fastest, most space-conserving(节约空间), most portable(可移植的), or
+  most tunable(可调的) malloc ever written. However it is among the fastest
   while also being among the most space-conserving, portable and
-  tunable.  Consistent balance across these factors results in a good
-  general-purpose allocator for malloc-intensive programs.
+  tunable.  Consistent(一贯) balance across these factors results in a good
+  general-purpose(通用) allocator for malloc-intensive(密集的) programs.
 
-  In most ways, this malloc is a best-fit allocator. Generally, it
-  chooses the best-fitting existing chunk for a request, with ties
-  broken in approximately least-recently-used order. (This strategy
-  normally maintains low fragmentation.) However, for requests less
-  than 256bytes, it deviates from best-fit when there is not an
-  exactly fitting available chunk by preferring to use space adjacent
+  In most ways, this malloc is a best-fit(最佳适配) allocator. Generally, it
+  chooses the best-fitting(最佳拟合) existing chunk for a request, with ties(纽带)
+  broken in approximately(大概) least(最少的)-recently-used order. (This strategy(策略)
+  normally maintains(保持) low fragmentation(碎片).) However, for requests less
+  than 256bytes, it deviates(偏离) from best-fit when there is not an
+  exactly fitting available chunk by preferring to use space adjacent(邻接的)
   to that used for the previous small request, as well as by breaking
-  ties in approximately most-recently-used order. (These enhance
+  ties in approximately most-recently-used order. (These enhance(提高)
   locality of series of small allocations.)  And for very large requests
-  (>= 256Kb by default), it relies on system memory mapping
-  facilities, if supported.  (This helps avoid carrying around and
+  (>= 256Kb by default), it relies(依赖) on system memory mapping
+  facilities(设施), if supported.  (This helps avoid carrying around and
   possibly fragmenting memory used only for large chunks.)
 
+  ？？？？？？？？？？？？？？？？？？？？？？？？？？？？？？？？？
   All operations (except malloc_stats and mallinfo) have execution
-  times that are bounded by a constant factor of the number of bits in
+  times that are bounded(界限) by a constant factor of the number of bits in
   a size_t, not counting any clearing in calloc or copying in realloc,
   or actions surrounding MORECORE and MMAP that have times
-  proportional to the number of non-contiguous regions returned by
-  system allocation routines, which is often just 1. In real-time
-  applications, you can optionally suppress segment traversals using
-  NO_SEGMENT_TRAVERSAL, which assures bounded execution even when
+  proportional(成比例的) to the number of non-contiguous(不连续的) regions returned by
+  system allocation routines(例程), which is often just 1. In real-time
+  applications, you can optionally suppress(阻止) segment traversals(遍历) using
+  NO_SEGMENT_TRAVERSAL, which assures(确保) bounded execution even when
   system allocators return non-contiguous spaces, at the typical
-  expense of carrying around more memory and increased fragmentation.
+  expense(开支) of carrying around more memory and increased fragmentation.
 
-  The implementation is not very modular and seriously overuses
+  The implementation is not very modular(摸块化) and seriously overuses
   macros. Perhaps someday all C compilers will do as good a job
-  inlining modular code as can now be done by brute-force expansion,
+  inlining modular code as can now be done by brute-force(强制性) expansion,
   but now, enough of them seem not to.
 
   Some compilers issue a lot of warnings about code that is
-  dead/unreachable only on some platforms, and also about intentional
-  uses of negation on unsigned types. All known cases of each can be
+  dead/unreachable only on some platforms, and also about intentional(故意的)
+  uses of negation(否定) on unsigned types. All known cases of each can be
   ignored.
 
   For a longer but out of date high-level description, see
@@ -205,22 +246,22 @@
   indicating its originating mspace, and frees are directed to their
   originating spaces.
 
- -------------------------  Compile-time options ---------------------------
+ -------------------------  Compile-time options(编译时选项) ---------------------------
 
 Be careful in setting #define values for numerical constants of type
-size_t. On some systems, literal values are not automatically extended
-to size_t precision unless they are explicitly casted. You can also
+size_t. On some systems, (literal values)(常值) are not automatically extended
+to size_t precision(精度) unless they are explicitly(明确地) casted. You can also
 use the symbolic values MAX_SIZE_T, SIZE_T_ONE, etc below.
 
 WIN32                    default: defined if _WIN32 defined
   Defining WIN32 sets up defaults for MS environment and compilers.
-  Otherwise defaults are for unix. Beware that there seem to be some
-  cases where this malloc might not be a pure drop-in replacement for
+  Otherwise defaults are for unix. Beware(当心) that there seem to be some
+  cases(问题) where this malloc might not be a pure drop-in replacement for
   Win32 malloc: Random-looking failures from Win32 GDI API's (eg;
   SetDIBits()) may be due to bugs in some video driver implementations
-  when pixel buffers are malloc()ed, and the region spans more than
+  when pixel buffers are malloc()ed, and the region spans(跨度) more than
   one VirtualAlloc()ed region. Because dlmalloc uses a small (64Kb)
-  default granularity, pixel buffers may straddle virtual allocation
+  default granularity(颗粒度), pixel buffers may straddle(叉开) virtual allocation
   regions more often than when using the Microsoft allocator.  You can
   avoid this by using VirtualAlloc() and VirtualFree() for all pixel
   buffers rather than using malloc().  If this is not possible,
@@ -2479,7 +2520,7 @@ struct malloc_params {
   volatile size_t magic;
   size_t page_size;
   size_t granularity;
-  size_t mmap_threshold;	//zdf mmap的阀值
+  size_t mmap_threshold;	//zdf mmap的阀值，((size_t)256U * (size_t)1024U)，表示什么，做什么用
   size_t trim_threshold;
   flag_t default_mflags;
 };
