@@ -290,7 +290,7 @@ USE_LOCKS                default: 0 (false)
   as described below.
 
 USE_SPIN_LOCKS           default: 1 iff USE_LOCKS and on x86 using gcc or MSC
-  If true, uses custom spin locks for locking. This is currently
+  If true, uses custom spin(旋转) locks for locking. This is currently
   supported only for x86 platforms using gcc or recent MS compilers.
   Otherwise, posix locks or win32 critical sections are used.
 
@@ -300,7 +300,7 @@ FOOTERS                  default: 0
   space and time overhead.
 
 INSECURE                 default: 0
-  If true, omit checks for usage errors and heap space overwrites.
+  If true, omit(省略) checks for usage errors and heap space overwrites.
 
 USE_DL_PREFIX            default: NOT defined
   Causes compiler to prefix all public routines with the string 'dl'.
@@ -319,22 +319,22 @@ ABORT                    default: defined as abort()
   can better optimize code conditionally calling it.
 
 PROCEED_ON_ERROR           default: defined as 0 (false)
-  Controls whether detected bad addresses cause them to bypassed
+  Controls whether detected(检测) bad addresses cause them to bypassed(绕过)
   rather than aborting. If set, detected bad arguments to free and
   realloc are ignored. And all bookkeeping information is zeroed out
   upon a detected overwrite of freed heap space, thus losing the
   ability to ever return it from malloc again, but enabling the
   application to proceed. If PROCEED_ON_ERROR is defined, the
   static variable malloc_corruption_error_count is compiled in
-  and can be examined to see if errors have occurred. This option
+  and can be examined(检查) to see if errors have occurred. This option
   generates slower code than the default abort policy.
 
 DEBUG                    default: NOT defined
   The DEBUG setting is mainly intended for people trying to modify
-  this code or diagnose problems when porting to new platforms.
-  However, it may also be able to better isolate user errors than just
-  using runtime checks.  The assertions in the check routines spell
-  out in more detail the assumptions and invariants underlying the
+  this code or diagnose(诊断) problems when porting to new platforms.
+  However, it may also be able to better isolate(分离) user errors than just
+  using runtime checks.  The assertions in the check routines spell out(详加说明)
+  in more detail the assumptions(假设) and invariants(约束条件) underlying(潜在的) the
   algorithms.  The checking is fairly extensive, and will slow down
   execution noticeably. Calling malloc_stats or mallinfo with DEBUG
   set will attempt to check every non-mmapped allocated and free chunk
@@ -343,7 +343,7 @@ DEBUG                    default: NOT defined
 ABORT_ON_ASSERT_FAILURE   default: defined as 1 (true)
   Debugging assertion failures can be nearly impossible if your
   version of the assert macro causes malloc to be called, which will
-  lead to a cascade of further failures, blowing the runtime stack.
+  lead to a cascade(一连串的) of further failures, blowing(井喷) the runtime stack.
   ABORT_ON_ASSERT_FAILURE cause assertions failures to call abort(),
   which will usually make debugging easier.
 
@@ -358,7 +358,7 @@ MORECORE                  default: sbrk
   The name of the sbrk-style system routine to call to obtain more
   memory.  See below for guidance on writing custom MORECORE
   functions. The type of the argument to sbrk/MORECORE varies across
-  systems.  It cannot be size_t, because it supports negative
+  systems.  It cannot be size_t, because it supports negative(负的)
   arguments, so it is normally the signed type of the same width as
   size_t (sometimes declared as "intptr_t").  It doesn't much matter
   though. Internally, we only call it with arguments less than half
@@ -366,7 +366,7 @@ MORECORE                  default: sbrk
   possibilities, although sometimes generating compiler warnings.
 
 MORECORE_CONTIGUOUS       default: 1 (true) if HAVE_MORECORE
-  If true, take advantage of fact that consecutive calls to MORECORE
+  If true, take advantage of fact that consecutive(连续的) calls to MORECORE
   with positive arguments always return contiguous increasing
   addresses.  This is true of unix sbrk. It does not hurt too much to
   set it true anyway, since malloc copes with non-contiguities.
@@ -376,11 +376,11 @@ MORECORE_CONTIGUOUS       default: 1 (true) if HAVE_MORECORE
 MORECORE_CANNOT_TRIM      default: NOT defined
   True if MORECORE cannot release space back to the system when given
   negative arguments. This is generally necessary only if you are
-  using a hand-crafted MORECORE function that cannot handle negative
+  using a hand-crafted(手工) MORECORE function that cannot handle negative
   arguments.
 
 NO_SEGMENT_TRAVERSAL       default: 0
-  If non-zero, suppresses traversals of memory segments
+  If non-zero, suppresses(阻止) traversals of memory segments
   returned by either MORECORE or CALL_MMAP. This disables
   merging of segments that are contiguous, and selectively
   releasing them to the OS if unused, but bounds execution times.
@@ -391,9 +391,9 @@ HAVE_MMAP                 default: 1 (true)
   allocation. If set and HAVE_MORECORE is true as well, MMAP is
   primarily used to directly allocate very large blocks. It is also
   used as a backup strategy in cases where MORECORE fails to provide
-  space from system. Note: A single call to MUNMAP is assumed to be
+  space from system. Note: A single call to MUNMAP is assumed(假定) to be
   able to unmap memory that may have be allocated using multiple calls
-  to MMAP, so long as they are adjacent.
+  to MMAP, so long as they are adjacent(邻接的).
 
 HAVE_MREMAP               default: 1 on linux, else 0
   If true realloc() uses mremap() to re-allocate large blocks and
@@ -424,7 +424,7 @@ USE_DEV_RANDOM             default: 0 (i.e., not used)
 
 NO_MALLINFO                default: 0
   If defined, don't compile "mallinfo". This can be a simple way
-  of dealing with mismatches between system declarations and
+  of dealing with mismatches(不匹配的) between system declarations and
   those in this file.
 
 MALLINFO_FIELD_TYPE        default: size_t
@@ -610,7 +610,7 @@ MAX_RELEASE_CHECK_RATE   default: 4095 unless not HAVE_MMAP
 #define PROCEED_ON_ERROR 0
 #endif  /* PROCEED_ON_ERROR */
 #ifndef USE_LOCKS
-#define USE_LOCKS 0
+#define USE_LOCKS 1
 #endif  /* USE_LOCKS */
 #ifndef USE_SPIN_LOCKS
 #if USE_LOCKS && SPIN_LOCKS_AVAILABLE
