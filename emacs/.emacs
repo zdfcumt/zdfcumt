@@ -5,8 +5,8 @@
 
 
 
-(setenv "HOME" "d:/emacs23")
-(setenv "PATH" "d:/emacs23")
+(setenv "HOME" "F:/Linux/Programs/emacs")
+(setenv "PATH" "F:/Linux/Programs/emacs")
 ;;set the default file path
 (setq default-directory "~/")
 (add-to-list 'load-path "~/site-lisp")
@@ -189,6 +189,7 @@
 ;;打开显示书签
 (enable-visual-studio-bookmarks)
 (setq bookmark-save-flag 1)         ;;保存书签
+(global-set-key [M-f2] 'bookmark-save)
 
 
 

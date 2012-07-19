@@ -18,6 +18,7 @@
 ;;C-F2 		查找下一个书签
 ;;S-F2 		查找上一个书签
 ;;C-S-F2 	清空当前文件的所有书签
+;;M-F2		保留书签
 ;;C-x r m (name)	M-x bookmark-set	设置书签
 ;;C-x r b (name)	M-x bookmark-jump	跳转到书签
 ;;C-x r l		M-x bookmark-bmenu-list	书签列表
