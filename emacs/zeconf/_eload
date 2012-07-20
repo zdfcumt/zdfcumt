@@ -1,0 +1,17 @@
+;;set the default file path
+(add-to-list 'load-path "~/site-lisp")
+
+
+(load-file "~/cedet/common/cedet.el")
+(add-to-list 'load-path "~/ecb")
+
+(global-ede-mode 1) ; Enable the Project management system
+;; (semantic-load-enable-minimum-features)
+;; (semantic-load-enable-code-helpers)
+;; (semantic-load-enable-guady-code-helpers)
+(semantic-load-enable-excessive-code-helpers)
+(semantic-load-enable-semantic-debugging-helpers)
+(global-srecode-minor-mode 1) ; Enable template insertion menu
+
+(require 'ecb-autoloads)        ;;ecb
+(require 'xcscope)              ;;º”‘ÿcscope

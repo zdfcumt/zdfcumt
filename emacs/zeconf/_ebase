@@ -1,0 +1,15 @@
+(tool-bar-mode -1)      ;;隐藏工具栏
+;;(menu-bar-mode -1)    ;;隐藏菜单栏
+
+
+(require 'linum)                                            ;;显示等号
+(setq linum-format "%4d ")
+(add-hook 'find-file-hooks (lambda () (linum-mode 1)))      ;;对所有文件生效
+
+
+(define-key   global-map   "\C-c\C-g"   'goto-line)         ;;跳到指定行
+(enable-visual-studio-bookmarks)                            ;;打开显示书签
+(setq bookmark-save-flag 1)                                 ;;保存书签
+(global-set-key [M-f2] 'bookmark-save)
+
+

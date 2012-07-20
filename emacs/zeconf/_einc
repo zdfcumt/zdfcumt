@@ -1,0 +1,31 @@
+
+;;ÅäÖÃSemanticµÄ¼ìË÷·¶Î§:
+;;(setq semanticdb-project-roots 
+;;  (list
+;;    (expand-file-name "~/")
+;;  )
+;;)
+
+(defconst cedet-user-include-dirs
+  (list ".." "../include" "../inc" "../common" "../public"
+        "../.." "../../include" "../../inc" "../../common" "../../public"))
+(defconst cedet-win32-include-dirs
+  (list "D:/MinGW/include"
+        "D:/MinGW/include/ddk"
+        "D:/MinGW/include/gdb"
+        "D:/MinGW/include/gdiplus"
+        "D:/MinGW/include/GL"
+        "D:/MinGW/include/libltdl"
+        "D:/MinGW/include/sys"
+        "D:/MinGW/lib/gcc/mingw32/4.7.0/include"
+        ;;"D:/Program Files/Microsoft Visual Studio 9.0/VC/include"
+    )
+)
+(require 'semantic-c nil 'noerror)
+(let ((include-dirs cedet-user-include-dirs))
+  (when (eq system-type 'windows-nt)
+    (setq include-dirs (append include-dirs cedet-win32-include-dirs)))
+  (mapc (lambda (dir)
+          (semantic-add-system-include dir 'c++-mode)
+          (semantic-add-system-include dir 'c-mode))
+        include-dirs))
