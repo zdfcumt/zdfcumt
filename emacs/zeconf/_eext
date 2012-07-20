@@ -38,8 +38,13 @@
 ;;ecb设置
 ;;打开emacs，然后M-x ecb-activate即可打开ecb。
 (global-set-key [f3] 'ecb-activate)
-
-
+(define-key global-map [(control f3)] 'ecb-hide-ecb-windows)
+(define-key global-map [(shift f3)] 'ecb-show-ecb-windows)
+;; 各窗口间切换
+(global-set-key [M-left]	 'windmove-left)
+(global-set-key [M-right]	 'windmove-right)
+(global-set-key [M-up]		 'windmove-up)
+(global-set-key [M-down]	 'windmove-down)
 
 
 ;;因为gdb-many-windows的窗口太小,有时候不能完全显示一行的内容,所以不得不来回切换gdb-many-windows模式,在绑定快捷键以后就方便多了.

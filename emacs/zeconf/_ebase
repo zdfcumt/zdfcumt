@@ -17,3 +17,9 @@
 ;;暂时不使用，文字编码有问题
 ;;(require 'session) ;;session
 ;;(add-hook 'after-init-hook 'session-initialize)
+
+
+(global-set-key (kbd "C-c f")	'occur)
+(global-set-key (kbd "C-c h") 	'replace-string)
+
+

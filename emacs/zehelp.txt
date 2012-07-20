@@ -1,4 +1,29 @@
-;;F3 ecb
+
+;;跳转
+;;F1			跳到
+;;C-F1			回跳
+;;C-S-F1		声明与实现之间的跳转
+
+;;bookmark
+;;F2			在当前行设置或取消书签
+;;C-F2			查找下一个书签
+;;S-F2 			查找上一个书签
+;;C-S-F2		清空当前文件的所有书签
+;;M-F2			保存书签
+;;C-x r m (name)	M-x bookmark-set	设置书签
+;;C-x r b (name)	M-x bookmark-jump	跳转到书签
+;;C-x r l		M-x bookmark-bmenu-list	书签列表
+;; 			M-x bookmark-delete	删除书签
+;; 			M-x bookmark-load	读取存储书签文件
+
+;;ecb
+;;F3			加载并显示ecb
+;;C-F3			隐藏ecb
+;;S-F3			显示ecb
+;;M-right or left	ecb左右窗口切换
+;;M-top or down		ecb上下窗口切换
+
+
 ;;F4 speedbar
 ;;F7 gdb
 ;;F8 gdb-many-windows
@@ -13,22 +38,6 @@
 ;;goto
 ;;C-c C-g	goto line
 
-;;bookmark
-;;F2		在当前行设置或取消书签
-;;C-F2 		查找下一个书签
-;;S-F2 		查找上一个书签
-;;C-S-F2 	清空当前文件的所有书签
-;;M-F2		保留书签
-;;C-x r m (name)	M-x bookmark-set	设置书签
-;;C-x r b (name)	M-x bookmark-jump	跳转到书签
-;;C-x r l		M-x bookmark-bmenu-list	书签列表
-;; 			M-x bookmark-delete	删除书签
-;; 			M-x bookmark-load	读取存储书签文件
-
-;;跳转
-;;F1			跳到
-;;C-F1			回跳
-;;C-S-F1		声明与实现之间的跳转
 
 ;;查找
 ;;C-r			向前查找
@@ -45,3 +54,13 @@
 ;;C-c d =		展开所有宏代码
 ;;C-c d _		折叠所有宏代码
 ;;C-c d +		展开所有宏代码
+
+;;查找与替换
+;;C-c f			查找所有
+;;C-c h			替换所有
+
+;;切换窗口
+;;C-x o			切换窗口other
+;;C-x 2			分割窗口
+
+

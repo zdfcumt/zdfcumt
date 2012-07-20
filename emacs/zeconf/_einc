@@ -10,14 +10,14 @@
   (list ".." "../include" "../inc" "../common" "../public"
         "../.." "../../include" "../../inc" "../../common" "../../public"))
 (defconst cedet-win32-include-dirs
-  (list "D:/MinGW/include"
-        "D:/MinGW/include/ddk"
-        "D:/MinGW/include/gdb"
-        "D:/MinGW/include/gdiplus"
-        "D:/MinGW/include/GL"
-        "D:/MinGW/include/libltdl"
-        "D:/MinGW/include/sys"
-        "D:/MinGW/lib/gcc/mingw32/4.7.0/include"
+  (list "F:/Linux/Programs/MinGW/include"
+        "F:/Linux/Programs/MinGW/include/ddk"
+        "F:/Linux/Programs/MinGW/include/gdb"
+        "F:/Linux/Programs/MinGW/include/gdiplus"
+        "F:/Linux/Programs/MinGW/include/GL"
+        "F:/Linux/Programs/MinGW/include/libltdl"
+        "F:/Linux/Programs/MinGW/include/sys"
+        "F:/Linux/Programs/MinGW/lib/gcc/mingw32/4.7.0/include"
         ;;"D:/Program Files/Microsoft Visual Studio 9.0/VC/include"
     )
 )
