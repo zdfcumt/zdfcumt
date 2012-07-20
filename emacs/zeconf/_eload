@@ -14,4 +14,4 @@
 (global-srecode-minor-mode 1) ; Enable template insertion menu
 
 (require 'ecb-autoloads)        ;;ecb
-(require 'xcscope)              ;;º”‘ÿcscope
+(require 'xcscope)              ;;º”‘ÿcscope 

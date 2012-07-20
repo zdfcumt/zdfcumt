@@ -13,3 +13,7 @@
 (global-set-key [M-f2] 'bookmark-save)
 
 
+(desktop-save-mode 1)		;;自动保留桌面
+;;暂时不使用，文字编码有问题
+;;(require 'session) ;;session
+;;(add-hook 'after-init-hook 'session-initialize)

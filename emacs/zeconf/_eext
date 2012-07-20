@@ -54,6 +54,27 @@
 
 
 
+
+;;代码折叠
+(require 'semantic-tag-folding nil 'noerror)
+(global-semantic-tag-folding-mode 1)
+;;按键绑定到了[C-c , -]和[C-c , +]上
+;;define-key semantic-tag-folding-mode-map (kbd "C-c , -") 'semantic-tag-folding-fold-block)
+;;(define-key semantic-tag-folding-mode-map (kbd "C-c , =") 'semantic-tag-folding-show-block)
+;;同时打开和折叠整个buffer的所有代码，绑定到了[C-c _]和[C-c +]上
+;;(define-key semantic-tag-folding-mode-map (kbd "C-c _") 'semantic-tag-folding-fold-all)
+;;(define-key semantic-tag-folding-mode-map (kbd "C-c +") 'semantic-tag-folding-show-all))
+(global-set-key (kbd "C-c d -") 'hide-ifdef-block)
+(global-set-key (kbd "C-c d =") 'show-ifdef-block)
+(global-set-key (kbd "C-c d _") 'hide-ifdefs)
+(global-set-key (kbd "C-c d +") 'show-ifdefs)
+(global-set-key (kbd "C-c -") 'hs-hide-block)
+(global-set-key (kbd "C-c =") 'hs-show-block)
+(global-set-key (kbd "C-c _") 'hs-hide-all)
+(global-set-key (kbd "C-c +") 'hs-show-all)
+
+
+
 ;;跳转
 (global-set-key [f1] 'semantic-ia-fast-jump)
 ;;回跳
@@ -85,3 +106,7 @@
      (set (make-local-variable 'compile-command) 
           (concat "g++ " (file-relative-name buffer-file-name) " -Wall -W -pipe -O2 -s && ./a")))) 
 (add-hook 'c++-mode-hook 'make-compile-command) 
+
+
+
+
