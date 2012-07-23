@@ -1790,14 +1790,14 @@ static FORCEINLINE int win32munmap(void* ptr, size_t size) {
 */
 
 #if !USE_LOCKS
-#define USE_LOCK_BIT               (0U)
-#define INITIAL_LOCK(l)            (0)
-#define DESTROY_LOCK(l)            (0)
-#define ACQUIRE_MALLOC_GLOBAL_LOCK()
-#define RELEASE_MALLOC_GLOBAL_LOCK()
+#  define USE_LOCK_BIT               (0U)
+#  define INITIAL_LOCK(l)            (0)
+#  define DESTROY_LOCK(l)            (0)
+#  define ACQUIRE_MALLOC_GLOBAL_LOCK()
+#  define RELEASE_MALLOC_GLOBAL_LOCK()
 
 #else
-#if USE_LOCKS > 1
+#  if USE_LOCKS > 1
 /* -----------------------  User-defined locks ------------------------ */
 /* Define your own lock implementation here */
 /* #define INITIAL_LOCK(lk)  ... */
@@ -1807,16 +1807,16 @@ static FORCEINLINE int win32munmap(void* ptr, size_t size) {
 /* #define TRY_LOCK(lk) ... */
 /* static MLOCK_T malloc_global_mutex = ... */
 
-#elif USE_SPIN_LOCKS
+#  elif USE_SPIN_LOCKS
 
 /* First, define CAS_LOCK and CLEAR_LOCK on ints */
 /* Note CAS_LOCK defined to return 0 on success */
 
-#if defined(__GNUC__)&& (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 1))
-#define CAS_LOCK(sl)     __sync_lock_test_and_set(sl, 1)
-#define CLEAR_LOCK(sl)   __sync_lock_release(sl)
+#    if defined(__GNUC__)&& (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 1))
+#      define CAS_LOCK(sl)     __sync_lock_test_and_set(sl, 1)
+#      define CLEAR_LOCK(sl)   __sync_lock_release(sl)
 
-#elif (defined(__GNUC__) && (defined(__i386__) || defined(__x86_64__)))
+#    elif (defined(__GNUC__) && (defined(__i386__) || defined(__x86_64__)))
 /* Custom spin locks for older gcc on x86 */
 static FORCEINLINE int x86_cas_lock(int *sl) {
   int ret;
@@ -1839,29 +1839,29 @@ static FORCEINLINE void x86_clear_lock(int* sl) {
                         : "memory");
 }
 
-#define CAS_LOCK(sl)     x86_cas_lock(sl)
-#define CLEAR_LOCK(sl)   x86_clear_lock(sl)
+#      define CAS_LOCK(sl)     x86_cas_lock(sl)
+#      define CLEAR_LOCK(sl)   x86_clear_lock(sl)
 
-#else /* Win32 MSC */
-#define CAS_LOCK(sl)     interlockedexchange(sl, 1)
-#define CLEAR_LOCK(sl)   interlockedexchange (sl, 0)
+#    else /* Win32 MSC */
+#      define CAS_LOCK(sl)     interlockedexchange(sl, 1)
+#      define CLEAR_LOCK(sl)   interlockedexchange (sl, 0)
 
-#endif /* ... gcc spins locks ... */
+#    endif /* ... gcc spins locks ... */
 
 /* How to yield for a spin lock */
-#define SPINS_PER_YIELD       63
-#if defined(_MSC_VER)
-#define SLEEP_EX_DURATION     50 /* delay for yield/sleep */
-#define SPIN_LOCK_YIELD  SleepEx(SLEEP_EX_DURATION, FALSE)
-#elif defined (__SVR4) && defined (__sun) /* solaris */
-#define SPIN_LOCK_YIELD   thr_yield();
-#elif !defined(LACKS_SCHED_H)
-#define SPIN_LOCK_YIELD   sched_yield();
-#else
-#define SPIN_LOCK_YIELD
-#endif /* ... yield ... */
+#    define SPINS_PER_YIELD       63
+#    if defined(_MSC_VER)
+#      define SLEEP_EX_DURATION     50 /* delay for yield/sleep */
+#      define SPIN_LOCK_YIELD  SleepEx(SLEEP_EX_DURATION, FALSE)
+#    elif defined (__SVR4) && defined (__sun) /* solaris */
+#      define SPIN_LOCK_YIELD   thr_yield();
+#    elif !defined(LACKS_SCHED_H)
+#      define SPIN_LOCK_YIELD   sched_yield();
+#    else
+#      define SPIN_LOCK_YIELD
+#    endif /* ... yield ... */
 
-#if !defined(USE_RECURSIVE_LOCKS) || USE_RECURSIVE_LOCKS == 0
+#    if !defined(USE_RECURSIVE_LOCKS) || USE_RECURSIVE_LOCKS == 0
 /* Plain spin locks use single word (embedded in malloc_states) */
 static int spin_acquire_lock(int *sl) {
   int spins = 0;
@@ -1873,30 +1873,30 @@ static int spin_acquire_lock(int *sl) {
   return 0;
 }
 
-#define MLOCK_T               int
-#define TRY_LOCK(sl)          !CAS_LOCK(sl)
-#define RELEASE_LOCK(sl)      CLEAR_LOCK(sl)
-#define ACQUIRE_LOCK(sl)      (CAS_LOCK(sl)? spin_acquire_lock(sl) : 0)
-#define INITIAL_LOCK(sl)      (*sl = 0)
-#define DESTROY_LOCK(sl)      (0)
+#      define MLOCK_T               int
+#      define TRY_LOCK(sl)          !CAS_LOCK(sl)
+#      define RELEASE_LOCK(sl)      CLEAR_LOCK(sl)
+#      define ACQUIRE_LOCK(sl)      (CAS_LOCK(sl)? spin_acquire_lock(sl) : 0)
+#      define INITIAL_LOCK(sl)      (*sl = 0)
+#      define DESTROY_LOCK(sl)      (0)
 static MLOCK_T malloc_global_mutex = 0;
 
-#else /* USE_RECURSIVE_LOCKS */
+#    else /* USE_RECURSIVE_LOCKS */
 /* types for lock owners */
-#ifdef WIN32
-#define THREAD_ID_T           DWORD
-#define CURRENT_THREAD        GetCurrentThreadId()
-#define EQ_OWNER(X,Y)         ((X) == (Y))
-#else
+#      ifdef WIN32
+#        define THREAD_ID_T           DWORD
+#        define CURRENT_THREAD        GetCurrentThreadId()
+#        define EQ_OWNER(X,Y)         ((X) == (Y))
+#      else
 /*
   Note: the following assume that pthread_t is a type that can be
   initialized to (casted) zero. If this is not the case, you will need to
   somehow redefine these or not use spin locks.
 */
-#define THREAD_ID_T           pthread_t
-#define CURRENT_THREAD        pthread_self()
-#define EQ_OWNER(X,Y)         pthread_equal(X, Y)
-#endif
+#        define THREAD_ID_T           pthread_t
+#        define CURRENT_THREAD        pthread_self()
+#        define EQ_OWNER(X,Y)         pthread_equal(X, Y)
+#      endif
 
 struct malloc_recursive_lock {
   int sl;
@@ -1904,7 +1904,7 @@ struct malloc_recursive_lock {
   THREAD_ID_T threadid;
 };
 
-#define MLOCK_T  struct malloc_recursive_lock
+#      define MLOCK_T  struct malloc_recursive_lock
 static MLOCK_T malloc_global_mutex = { 0, 0, (THREAD_ID_T)0};
 
 static FORCEINLINE void recursive_release_lock(MLOCK_T *lk) {
@@ -1951,21 +1951,21 @@ static FORCEINLINE int recursive_try_lock(MLOCK_T *lk) {
   return 0;
 }
 
-#define RELEASE_LOCK(lk)      recursive_release_lock(lk)
-#define TRY_LOCK(lk)          recursive_try_lock(lk)
-#define ACQUIRE_LOCK(lk)      recursive_acquire_lock(lk)
-#define INITIAL_LOCK(lk)      ((lk)->threadid = (THREAD_ID_T)0, (lk)->sl = 0, (lk)->c = 0)
-#define DESTROY_LOCK(lk)      (0)
-#endif /* USE_RECURSIVE_LOCKS */
+#      define RELEASE_LOCK(lk)      recursive_release_lock(lk)
+#      define TRY_LOCK(lk)          recursive_try_lock(lk)
+#      define ACQUIRE_LOCK(lk)      recursive_acquire_lock(lk)
+#      define INITIAL_LOCK(lk)      ((lk)->threadid = (THREAD_ID_T)0, (lk)->sl = 0, (lk)->c = 0)
+#      define DESTROY_LOCK(lk)      (0)
+#    endif /* USE_RECURSIVE_LOCKS */
 
-#elif defined(WIN32) /* Win32 critical sections */
-#define MLOCK_T               CRITICAL_SECTION
-#define ACQUIRE_LOCK(lk)      (EnterCriticalSection(lk), 0)
-#define RELEASE_LOCK(lk)      LeaveCriticalSection(lk)
-#define TRY_LOCK(lk)          TryEnterCriticalSection(lk)
-#define INITIAL_LOCK(lk)      (!InitializeCriticalSectionAndSpinCount((lk), 0x80000000|4000))
-#define DESTROY_LOCK(lk)      (DeleteCriticalSection(lk), 0)
-#define NEED_GLOBAL_LOCK_INIT
+#  elif defined(WIN32) /* Win32 critical sections */
+#    define MLOCK_T               CRITICAL_SECTION
+#    define ACQUIRE_LOCK(lk)      (EnterCriticalSection(lk), 0)
+#    define RELEASE_LOCK(lk)      LeaveCriticalSection(lk)
+#    define TRY_LOCK(lk)          TryEnterCriticalSection(lk)
+#    define INITIAL_LOCK(lk)      (!InitializeCriticalSectionAndSpinCount((lk), 0x80000000|4000))
+#    define DESTROY_LOCK(lk)      (DeleteCriticalSection(lk), 0)
+#    define NEED_GLOBAL_LOCK_INIT
 
 static MLOCK_T malloc_global_mutex;
 static volatile long malloc_global_mutex_status;
@@ -1987,22 +1987,22 @@ static void init_malloc_global_mutex() {
   }
 }
 
-#else /* pthreads-based locks */
-#define MLOCK_T               pthread_mutex_t
-#define ACQUIRE_LOCK(lk)      pthread_mutex_lock(lk)
-#define RELEASE_LOCK(lk)      pthread_mutex_unlock(lk)
-#define TRY_LOCK(lk)          (!pthread_mutex_trylock(lk))
-#define INITIAL_LOCK(lk)      pthread_init_lock(lk)
-#define DESTROY_LOCK(lk)      pthread_mutex_destroy(lk)
+#  else /* pthreads-based locks USE_LOCKS == 1 */
+#    define MLOCK_T               pthread_mutex_t
+#    define ACQUIRE_LOCK(lk)      pthread_mutex_lock(lk)
+#    define RELEASE_LOCK(lk)      pthread_mutex_unlock(lk)
+#    define TRY_LOCK(lk)          (!pthread_mutex_trylock(lk))
+#    define INITIAL_LOCK(lk)      pthread_init_lock(lk)
+#    define DESTROY_LOCK(lk)      pthread_mutex_destroy(lk)
 
-#if defined(USE_RECURSIVE_LOCKS) && USE_RECURSIVE_LOCKS != 0 && defined(linux) && !defined(PTHREAD_MUTEX_RECURSIVE)
+#    if defined(USE_RECURSIVE_LOCKS) && USE_RECURSIVE_LOCKS != 0 && defined(linux) && !defined(PTHREAD_MUTEX_RECURSIVE)
 /* Cope with old-style linux recursive lock initialization by adding */
 /* skipped internal declaration from pthread.h */
 extern int pthread_mutexattr_setkind_np __P ((pthread_mutexattr_t *__attr,
 					   int __kind));
-#define PTHREAD_MUTEX_RECURSIVE PTHREAD_MUTEX_RECURSIVE_NP
-#define pthread_mutexattr_settype(x,y) pthread_mutexattr_setkind_np(x,y)
-#endif /* USE_RECURSIVE_LOCKS ... */
+#      define PTHREAD_MUTEX_RECURSIVE PTHREAD_MUTEX_RECURSIVE_NP
+#      define pthread_mutexattr_settype(x,y) pthread_mutexattr_setkind_np(x,y)
+#    endif /* USE_RECURSIVE_LOCKS ... */
 
 static MLOCK_T malloc_global_mutex = PTHREAD_MUTEX_INITIALIZER;
 
@@ -2017,18 +2017,18 @@ static int pthread_init_lock (MLOCK_T *lk) {
   return 0;
 }
 
-#endif /* ... lock types ... */
+#  endif /* ... lock types ... */
 
 /* Common code for all lock types */
-#define USE_LOCK_BIT               (2U)
+#  define USE_LOCK_BIT               (2U)
 
-#ifndef ACQUIRE_MALLOC_GLOBAL_LOCK
-#define ACQUIRE_MALLOC_GLOBAL_LOCK()  ACQUIRE_LOCK(&malloc_global_mutex);
-#endif
+#  ifndef ACQUIRE_MALLOC_GLOBAL_LOCK
+#    define ACQUIRE_MALLOC_GLOBAL_LOCK()  ACQUIRE_LOCK(&malloc_global_mutex);
+#  endif
 
-#ifndef RELEASE_MALLOC_GLOBAL_LOCK
-#define RELEASE_MALLOC_GLOBAL_LOCK()  RELEASE_LOCK(&malloc_global_mutex);
-#endif
+#  ifndef RELEASE_MALLOC_GLOBAL_LOCK
+#    define RELEASE_MALLOC_GLOBAL_LOCK()  RELEASE_LOCK(&malloc_global_mutex);
+#  endif
 
 #endif /* USE_LOCKS */
 

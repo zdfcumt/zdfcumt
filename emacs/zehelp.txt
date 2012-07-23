@@ -25,8 +25,18 @@
 
 
 ;;F4 speedbar
-;;F7 gdb
-;;F8 gdb-many-windows
+
+;;F5 gdb-go or continue
+;;C-F5 关闭gdb调试
+;;F6 开始编译
+;;F7 开始gdb调试
+;;F8 gdb多窗口与单窗口切换
+;;F9 添加删除断点
+;;F10 下一条语句
+;;C-F10 运行到光标所在的行,??也可以直接把当前语句指示器拖到任意一行，程序会运行到那一行再停下来
+;;F11 进入函数
+;;C-F11 跳出函数
+
 
 ;;buff oper
 ;;C-x k		kill buff
