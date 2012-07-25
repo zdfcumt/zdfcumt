@@ -925,8 +925,9 @@ DLMALLOC_EXPORT void* dlmemalign(size_t, size_t);
   returns EINVAL if the alignment is not a power of two (3) fails and
   returns ENOMEM if memory cannot be allocated.
 */
+#ifndef WIN32
 DLMALLOC_EXPORT int dlposix_memalign(void**, size_t, size_t);
-
+#endif
 /*
   valloc(size_t n);
   Equivalent to memalign(pagesize, n), where pagesize is the page
@@ -1600,7 +1601,7 @@ unsigned char _BitScanReverse(unsigned long *index, unsigned long mask);
 #define HALF_MAX_SIZE_T     (MAX_SIZE_T / 2U)
 
 /* The bit mask value corresponding to MALLOC_ALIGNMENT */
-#define CHUNK_ALIGN_MASK    (MALLOC_ALIGNMENT - SIZE_T_ONE)
+#define CHUNK_ALIGN_MASK    (MALLOC_ALIGNMENT - SIZE_T_ONE)//zdf 7
 
 /* True if address a has acceptable alignment */
 #define is_aligned(A)       (((size_t)((A)) & (CHUNK_ALIGN_MASK)) == 0)
@@ -2190,7 +2191,7 @@ typedef unsigned int flag_t;           /* The type of various bit flag sets */
 #if FOOTERS
 #define CHUNK_OVERHEAD      (TWO_SIZE_T_SIZES)
 #else /* FOOTERS */
-#define CHUNK_OVERHEAD      (SIZE_T_SIZE)
+#define CHUNK_OVERHEAD      (SIZE_T_SIZE)//zdf 4
 #endif /* FOOTERS */
 
 /* MMapped chunks need a second word of overhead ... */
@@ -2199,7 +2200,8 @@ typedef unsigned int flag_t;           /* The type of various bit flag sets */
 #define MMAP_FOOT_PAD       (FOUR_SIZE_T_SIZES)
 
 /* The smallest size we can malloc is an aligned minimal chunk */
-#define MIN_CHUNK_SIZE\
+//zdf 16
+#define MIN_CHUNK_SIZE                                      \
   ((MCHUNK_SIZE + CHUNK_ALIGN_MASK) & ~CHUNK_ALIGN_MASK)
 
 /* conversion from malloc headers to user pointers, and back */
@@ -2210,7 +2212,7 @@ typedef unsigned int flag_t;           /* The type of various bit flag sets */
 
 /* Bounds on request (not chunk) sizes. */
 #define MAX_REQUEST         ((-MIN_CHUNK_SIZE) << 2)
-#define MIN_REQUEST         (MIN_CHUNK_SIZE - CHUNK_OVERHEAD - SIZE_T_ONE)
+#define MIN_REQUEST         (MIN_CHUNK_SIZE - CHUNK_OVERHEAD - SIZE_T_ONE)//zdf 11
 
 /* pad request bytes into a usable size */
 #define pad_request(req) \
@@ -2560,9 +2562,9 @@ typedef struct malloc_segment* msegmentptr;
 #define SMALLBIN_SHIFT    (3U)
 #define SMALLBIN_WIDTH    (SIZE_T_ONE << SMALLBIN_SHIFT)
 #define TREEBIN_SHIFT     (8U)
-#define MIN_LARGE_SIZE    (SIZE_T_ONE << TREEBIN_SHIFT)
-#define MAX_SMALL_SIZE    (MIN_LARGE_SIZE - SIZE_T_ONE)
-#define MAX_SMALL_REQUEST (MAX_SMALL_SIZE - CHUNK_ALIGN_MASK - CHUNK_OVERHEAD)
+#define MIN_LARGE_SIZE    (SIZE_T_ONE << TREEBIN_SHIFT)//zdf 256
+#define MAX_SMALL_SIZE    (MIN_LARGE_SIZE - SIZE_T_ONE)//zdf 255
+#define MAX_SMALL_REQUEST (MAX_SMALL_SIZE - CHUNK_ALIGN_MASK - CHUNK_OVERHEAD)//zdf 244
 
 struct malloc_state {
   binmap_t   smallmap;
@@ -5240,6 +5242,7 @@ void* dlmemalign(size_t alignment, size_t bytes) {
   return internal_memalign(gm, alignment, bytes);
 }
 
+#ifndef WIN32
 int dlposix_memalign(void** pp, size_t alignment, size_t bytes) {
   void* mem = 0;
   if (alignment == MALLOC_ALIGNMENT)
@@ -5262,7 +5265,7 @@ int dlposix_memalign(void** pp, size_t alignment, size_t bytes) {
     return 0;
   }
 }
-
+#endif
 void* dlvalloc(size_t bytes) {
   size_t pagesz;
   ensure_initialization();
