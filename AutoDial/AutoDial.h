@@ -15,7 +15,7 @@
 // 有关此类的实现，请参阅 AutoDial.cpp
 //
 
-class CAutoDialApp : public CWinAppEx
+class CAutoDialApp : public CWinApp
 {
 public:
 	CAutoDialApp();

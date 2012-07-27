@@ -13,7 +13,7 @@
 
 // CAutoDialApp
 
-BEGIN_MESSAGE_MAP(CAutoDialApp, CWinAppEx)
+BEGIN_MESSAGE_MAP(CAutoDialApp, CWinApp)
 	ON_COMMAND(ID_HELP, &CWinApp::OnHelp)
 END_MESSAGE_MAP()
 
@@ -46,7 +46,7 @@ BOOL CAutoDialApp::InitInstance()
 	InitCtrls.dwICC = ICC_WIN95_CLASSES;
 	InitCommonControlsEx(&InitCtrls);
 
-	CWinAppEx::InitInstance();
+	CWinApp::InitInstance();
 
 	AfxEnableControlContainer();
 
