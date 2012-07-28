@@ -98,8 +98,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,0,1
- PRODUCTVERSION 1,0,0,1
+ FILEVERSION 0,5,0,1
+ PRODUCTVERSION 0,5,0,1
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -114,14 +114,14 @@ BEGIN
     BEGIN
         BLOCK "080403a8"
         BEGIN
-            VALUE "CompanyName", "TODO: <公司名>"
-            VALUE "FileDescription", "TODO: <文件说明>"
-            VALUE "FileVersion", "1.0.0.1"
-            VALUE "InternalName", "AutoDial.exe"
-            VALUE "LegalCopyright", "TODO: (C) <公司名>。保留所有权利。"
-            VALUE "OriginalFilename", "AutoDial.exe"
-            VALUE "ProductName", "TODO: <产品名>"
-            VALUE "ProductVersion", "1.0.0.1"
+            VALUE "CompanyName", "Zabambo"
+            VALUE "FileDescription", "自动拨号连网"
+            VALUE "FileVersion", "0.5.0.1"
+            VALUE "InternalName", "ZAutoDial.exe"
+            VALUE "LegalCopyright", " (C) <Zabambo>保留所有权利"
+            VALUE "OriginalFilename", "ZAutoDial.exe"
+            VALUE "ProductName", "ZAutoDial"
+            VALUE "ProductVersion", "0.5.0.1"
         END
     END
     BLOCK "VarFileInfo"
