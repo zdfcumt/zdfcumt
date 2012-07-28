@@ -22,7 +22,7 @@
 namespace{
 	static const DWORD s_dwTimeEvent	= 1000;
 	static const CString s_csEntryName	= "Home";
-	static const char*	s_szTip[2]		= {"网络已连接", "正在重连网络"};
+	static const char*	s_szTip[2]		= {"ZAutoDial:网络已连接", "ZAutoDial:正在重连网络"};
 	static const CString s_csConfFile	= "conf.ini";
 }
 // CAutoDialDlg 对话框
@@ -79,18 +79,23 @@ BOOL CAutoDialDlg::OnInitDialog()
 	SetIcon(m_hIcon, TRUE);			// 设置大图标
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
 
+	SetWindowPos(NULL,0,0,0,0,NULL);
+	SetWindowLong(this->GetSafeHwnd(),GWL_EXSTYLE,WS_EX_TOOLWINDOW|WS_EX_STATICEDGE); 
+	
 	// TODO: 在此添加额外的初始化代码
-	if (0 == GetModuleFileName(NULL, m_szAppPath, MAX_PATH))
+	if (0 == GetModuleFileName(NULL, m_szAppPath, MAX_PATH)){
+		AfxMessageBox("获取程序运行路径失败");
+		EndDialog(IDCANCEL);
 		return FALSE;
-
+	}
 	if (!LoadConf()){
+		AfxMessageBox("加载配置文件失败");
+		EndDialog(IDCANCEL);
 		return FALSE;
 	}
 
 	RunWhenStart(TRUE);
-	SetWindowPos(NULL,0,0,0,0,NULL);
-	SetWindowLong(this->GetSafeHwnd(),GWL_EXSTYLE,WS_EX_TOOLWINDOW|WS_EX_STATICEDGE); 
-	
+
 	SetWindowText("ZAutoDial");
 	m_bConn = AutoCheck();
 	SetTimer(s_dwTimeEvent, m_dwTimeElapse * 1000, NULL);

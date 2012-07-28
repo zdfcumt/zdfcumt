@@ -2,7 +2,7 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="AutoDial"
+	Name="ZAutoDial"
 	ProjectGUID="{D95FE137-FAD6-41E4-86E2-AA7EBB31D618}"
 	RootNamespace="AutoDial"
 	Keyword="MFCProj"
