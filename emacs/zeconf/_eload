@@ -1,5 +1,6 @@
 ;;set the default file path
 (add-to-list 'load-path "~/site-lisp")
+(add-to-list 'load-path "~/.emacs.d/")
 
 
 (load-file "~/cedet/common/cedet.el")
@@ -15,3 +16,8 @@
 
 (require 'ecb-autoloads)        ;;ecb
 (require 'xcscope)              ;;º”‘ÿcscope 
+
+
+(require 'color-theme)
+(color-theme-initialize)
+(color-theme-deep-blue)
